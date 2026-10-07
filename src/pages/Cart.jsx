@@ -1,13 +1,15 @@
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useCart } from '../context/CartContext';
 import CartItem from '../components/CartItem';
 import Button from '../components/Button';
 
 export default function Cart() {
   const { items, total, clearCart } = useCart();
+  const shouldReduceMotion = useReducedMotion();
 
   return (
-    <div className="animate-page">
+    <div>
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-700 to-blue-600 text-white py-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,7 +23,12 @@ export default function Cart() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {items.length === 0 ? (
           /* Empty state */
-          <div className="text-center py-24">
+          <motion.div
+            className="text-center py-24"
+            initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, ease: 'easeOut' }}
+          >
             <p className="text-7xl mb-4" aria-hidden="true">🛒</p>
             <h2 className="text-xl font-bold text-gray-700 mb-2">Your cart is empty</h2>
             <p className="text-gray-400 text-sm mb-8">
@@ -30,14 +37,16 @@ export default function Cart() {
             <Link to="/products">
               <Button size="lg">Browse Products</Button>
             </Link>
-          </div>
+          </motion.div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Items list */}
+            {/* Items list — AnimatePresence animates items in/out */}
             <section className="lg:col-span-2 flex flex-col gap-4" aria-label="Cart items">
-              {items.map((item) => (
-                <CartItem key={item.id} item={item} />
-              ))}
+              <AnimatePresence initial={false}>
+                {items.map((item) => (
+                  <CartItem key={item.id} item={item} />
+                ))}
+              </AnimatePresence>
               <div className="flex items-center justify-between pt-2">
                 <Link to="/products" className="text-sm text-blue-600 font-medium hover:underline">
                   ← Continue Shopping
@@ -53,9 +62,12 @@ export default function Cart() {
             </section>
 
             {/* Order summary */}
-            <aside
+            <motion.aside
               className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 h-fit sticky top-20"
               aria-label="Order summary"
+              initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.4, ease: 'easeOut', delay: 0.1 }}
             >
               <h2 className="text-base font-bold text-gray-900 mb-4">Order Summary</h2>
 
@@ -81,7 +93,7 @@ export default function Cart() {
               <Link to="/checkout">
                 <Button size="lg" fullWidth>Proceed to Checkout →</Button>
               </Link>
-            </aside>
+            </motion.aside>
           </div>
         )}
       </div>

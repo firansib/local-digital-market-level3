@@ -1,3 +1,5 @@
+import { motion, useReducedMotion } from 'framer-motion';
+
 /**
  * Reusable Button
  * variant: 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost'
@@ -14,6 +16,8 @@ export default function Button({
   className = '',
   ...rest
 }) {
+  const shouldReduceMotion = useReducedMotion();
+
   const base =
     'inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer';
 
@@ -37,16 +41,18 @@ export default function Button({
   };
 
   return (
-    <button
+    <motion.button
       type={type}
       onClick={onClick}
       disabled={disabled}
+      whileTap={shouldReduceMotion || disabled ? {} : { scale: 0.96 }}
+      transition={{ duration: 0.1 }}
       className={[base, variants[variant], sizes[size], fullWidth ? 'w-full' : '', className]
         .filter(Boolean)
         .join(' ')}
       {...rest}
     >
       {children}
-    </button>
+    </motion.button>
   );
 }
